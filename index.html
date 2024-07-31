@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Chronicles</title>
+    <!-- Include Firebase App SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <!-- Include Firestore SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Adventure Chronicles</h1>
+        <div>
+            <h2>Add User</h2>
+            <input type="text" id="first-name" placeholder="First Name" />
+            <input type="text" id="last-name" placeholder="Last Name" />
+            <input type="number" id="born-year" placeholder="Year of Birth" />
+            <button onclick="addUser()">Add User</button>
+        </div>
+
+        <div>
+            <h2>Users List</h2>
+            <ul id="users-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuJX4BmRDjsGloTAVAmTw4akUa3uwLf1s",
+            authDomain: "adventurechronicles-cbd97.firebaseapp.com",
+            databaseURL: "https://adventurechronicles-cbd97-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "adventurechronicles-cbd97",
+            storageBucket: "adventurechronicles-cbd97.appspot.com",
+            messagingSenderId: "500217676332",
+            appId: "1:500217676332:web:6409c80db68a6855e24789",
+            measurementId: "G-PM1BEQ8L40"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Initialize Firestore
+        const db = firebase.firestore();
+
+        // Function to add a user to Firestore
+        function addUser() {
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const bornYear = document.getElementById('born-year').value;
+
+            db.collection('users').add({
+                first: firstName,
+                last: lastName,
+                born: parseInt(bornYear, 10)
+            })
+            .then((docRef) => {
+                console.log("Document written with ID: ", docRef.id);
+                loadUsers(); // Reload the users list after adding a new user
+            })
+            .catch((error) => {
+                console.error("Error adding document: ", error);
+            });
+        }
+
+        // Function to load users from Firestore
+        function loadUsers() {
+            db.collection('users').get().then((querySnapshot) => {
+                const usersList = document.getElementById('users-list');
+                usersList.innerHTML = ''; // Clear the list before adding new items
+
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${user.first} ${user.last}, born in ${user.born}`;
+                    usersList.appendChild(listItem);
+                });
+            });
+        }
+
+        // Load users on page load
+        window.onload = loadUsers;
+    </script>
+</body>
+</html>
